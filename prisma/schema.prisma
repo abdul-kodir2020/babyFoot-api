@@ -1,15 +1,84 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Sport {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  matches   Match[]
+  stats     PlayerStats[]
+}
+
+model Player {
+  id        Int            @id @default(autoincrement())
+  username  String         @unique
+  email     String         @unique
+  password  String         // hashé avec bcrypt
+  createdAt DateTime       @default(now())
+
+  // Relations avec les équipes
+  teamsAsPlayer1 Team[]    @relation("TeamPlayer1")
+  teamsAsPlayer2 Team[]    @relation("TeamPlayer2")
+
+  // Matchs créés
+  matchesCreated Match[]   @relation("CreatedMatches")
+
+  // Stats par sport
+  stats PlayerStats[]
+}
+
+model Team {
+  id        Int     @id @default(autoincrement())
+
+  // Joueur 1
+  player1   Player  @relation("TeamPlayer1", fields: [player1Id], references: [id])
+  player1Id Int
+
+  // Joueur 2 (optionnel)
+  player2   Player? @relation("TeamPlayer2", fields: [player2Id], references: [id])
+  player2Id Int?
+
+  // Matchs
+  matchesA  Match[] @relation("TeamA")
+  matchesB  Match[] @relation("TeamB")
+}
+
+model Match {
+  id          Int       @id @default(autoincrement())
+  sport       Sport     @relation(fields: [sportId], references: [id])
+  sportId     Int
+  creator     Player    @relation("CreatedMatches", fields: [creatorId], references: [id])
+  creatorId   Int
+  teamA       Team      @relation("TeamA", fields: [teamAId], references: [id])
+  teamAId     Int
+  teamB       Team      @relation("TeamB", fields: [teamBId], references: [id])
+  teamBId     Int
+  scoreTeamA  Int
+  scoreTeamB  Int
+  winnerTeam  String
+  playedAt    DateTime  @default(now())
+}
+
+model PlayerStats {
+  id            Int       @id @default(autoincrement())
+  player        Player    @relation(fields: [playerId], references: [id])
+  playerId      Int
+  sport         Sport     @relation(fields: [sportId], references: [id])
+  sportId       Int
+  matchesPlayed Int       @default(0)
+  wins          Int       @default(0)
+  losses        Int       @default(0)
+  goalsScored   Int       @default(0)
+  assists       Int       @default(0)
+  winRate       Float     @default(0)
+  eloRating     Float     @default(1000)
+  lastUpdated   DateTime  @default(now())
+
+  @@unique([playerId, sportId])
 }

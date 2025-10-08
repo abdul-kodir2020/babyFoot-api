@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: babyfoot_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: babyfoot_user
+      POSTGRES_PASSWORD: babyfoot_pass
+      POSTGRES_DB: babyfoot_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
