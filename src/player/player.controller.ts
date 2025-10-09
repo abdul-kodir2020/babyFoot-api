@@ -1,16 +1,19 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { PlayerService } from './player.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/auth/roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('players')
 export class PlayerController {
   constructor(private playerService: PlayerService) {}
 
+  @Roles(Role.ADMIN)
   @Post()
-  create(@Body() dto: CreatePlayerDto) {
-    return this.playerService.create(dto);
+  create(@Body() dto: CreatePlayerDto, @Req() req: any) {
+    return this.playerService.create(dto, req.user);
   }
 
   @Get()

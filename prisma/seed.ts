@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 /**
@@ -208,6 +209,19 @@ async function main() {
 
   await updateEloForMatch(match1.id);
   await updateEloForMatch(match2.id);
+
+  const password = await bcrypt.hash('Admin123!', 10);
+
+  await prisma.player.upsert({
+    where: { email: 'admin@babyfoot.local' },
+    update: {},
+    create: {
+      email: 'admin@babyfoot.local',
+      password,
+      username: 'SuperAdmin',
+      role: 'ADMIN',
+    },
+  });
 
   console.log('✅ Seed terminé avec mise à jour des ELO !');
 }

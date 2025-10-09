@@ -6,6 +6,7 @@ import { SportModule } from './sport/sport.module';
 import { TeamModule } from './team/team.module';
 import { MatchModule } from './match/match.module';
 import { StatsModule } from './stats/stats.module';
+import { RolesGuard } from './auth/roles.guard';
 
 
 @Module({
@@ -17,6 +18,9 @@ import { StatsModule } from './stats/stats.module';
     TeamModule,
     MatchModule,
     StatsModule,
+  ],
+  providers: [
+    { provide: 'APP_GUARD', useClass: RolesGuard }
   ],
 })
 export class AppModule {}

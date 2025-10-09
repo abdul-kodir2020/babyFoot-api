@@ -15,12 +15,19 @@ model Sport {
   stats     PlayerStats[]
 }
 
+enum Role {
+  PLAYER
+  ADMIN
+}
+
 model Player {
   id        Int            @id @default(autoincrement())
   username  String         @unique
   email     String         @unique
   password  String         // hashé avec bcrypt
   createdAt DateTime       @default(now())
+
+  role         Role         @default(PLAYER)
 
   // Relations avec les équipes
   teamsAsPlayer1 Team[]    @relation("TeamPlayer1")
