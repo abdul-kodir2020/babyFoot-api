@@ -2,8 +2,6 @@ import { Controller, Post, Body, UseGuards, Param, ParseIntPipe, Patch } from '@
 import { MatchService } from './match.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
-import { Request } from 'express';
-import { JwtStrategy } from '../auth/jwt.strategy';
 import { GetUser } from 'src/auth/get-user.decorator';
 
 @Controller('matches')
@@ -22,7 +20,8 @@ export class MatchController {
   finish(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: { scoreTeamA: number; scoreTeamB: number },
+    @GetUser('userId') userId: number
   ) {
-    return this.matchService.finishMatch(id, body.scoreTeamA, body.scoreTeamB);
+    return this.matchService.finishMatch(userId, id, body.scoreTeamA, body.scoreTeamB);
   }
 }
